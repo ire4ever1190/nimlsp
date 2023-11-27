@@ -115,18 +115,35 @@ func symRange(pos: Position): JsonNode =
   }
 
 suite "Renaming":
-  test "Can rename variable":
-    const varLen = "x".len
+  proc rename(pos: Position): seq[JsonNode] =
+    ## Helper to rename, returns list of ranges
     let resp = "textDocument/rename".sendMessage(
       RenameParams.create(
         textDocument = TextDocumentIdentifier.create(exampleFileURI),
         newName = "foo",
-        position = markers["rename.variableInit"]
+        position = pos
       ).JsonNode
     )
-    let changes = resp["result"]["changes"][exampleFileURI].mapIt(it["range"])
+    if resp["result"].kind == JNull: return
+    result = resp["result"]["changes"][exampleFileURI].mapIt(it["range"])
+
+  test "Can rename variable":
+    let changes = markers["rename.variableInit"].rename()
     check changes.len == 2
     check markers["rename.variableInit"].symRange() in changes
     check markers["rename.variableUse"].symRange() in changes
+
+  test "Can rename enum declaration":
+    let changes = markers["enum.declare"].rename()
+    check changes.len == 2
+    check markers["enum.declare"].symRange() in changes
+    check markers["enum.varuse"].symRange() in changes
+
+  test "Can rename enum at use":
+    let changes = markers["enum.varuse"].rename()
+    check changes.len == 2
+    check markers["enum.declare"].symRange() in changes
+    check markers["enum.varuse"].symRange() in changes
+
 
 p.terminate()
