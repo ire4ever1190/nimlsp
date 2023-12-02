@@ -1,10 +1,21 @@
 type
   Colour = enum
-    Red
+    Red #[ Marker
+     ^ enum.declare ]#
     Green
     Blue
 
-var x = Red #[ Marker
-    ^ test.rename.variableInit ]#
-x = Colour.Blue #[ Marker
-^ rename.variableUse ]#
+proc helloWorld() = discard
+
+
+helloWorld()
+
+block basicVariables:
+  var x = 1 #[ Marker
+      ^ rename.variableInit ]#
+  x = 2 #[ Marker
+  ^ rename.variableUse ]#
+
+block renameEnum:
+  var a = Red #[ Marker
+           ^ enum.varuse ]#
