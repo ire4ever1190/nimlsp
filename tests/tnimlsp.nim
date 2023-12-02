@@ -29,8 +29,8 @@ proc sendNotification(name: string, params: JsonNode) =
 # isn't very sophisticated but means lines can be rearranged
 # without issue
 const
-  testDir = currentSourcePath().parentDir()
-  exampleFilePath = testDir / "example.nim"
+  testDir = currentSourcePath().parentDir().parentDir()/"src"
+  exampleFilePath = testDir / "nimlsp.nim"
   exampleFileURI = "file://" & exampleFilePath
   exampleFile = readFile(exampleFilePath)
   exampleLines = exampleFile.splitLines()
