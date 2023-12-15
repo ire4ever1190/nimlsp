@@ -77,6 +77,12 @@ template textDocumentNotification(message, kind, name, body) {.dirty.} =
           filestash = storage / (hash(fileuri).toHex & ".nim" )
         body
 
+proc newMarkupContent(text: string): MarkupContent =
+  MarkupContent.create(
+    "markdown",
+    text
+  )
+
 proc pathToUri(path: string): string =
   # This is a modified copy of encodeUrl in the uri module. This doesn't encode
   # the / character, meaning a full file path can be passed in without breaking
@@ -345,6 +351,7 @@ proc main(ins: Stream | AsyncFile, outs: Stream | AsyncFile) {.multisync.} =
                 if suggestions[0].forth != "":
                   label &= ": "
                   label &= suggestions[0].forth
+                var docs = "```nim\n" & label & "\n```\n"
                 let
                   rangeopt =
                     some(create(Range,
@@ -353,15 +360,8 @@ proc main(ins: Stream | AsyncFile, outs: Stream | AsyncFile) {.multisync.} =
                     ))
                   markedString = create(MarkedStringOption, "nim", label)
                 if suggestions[0].doc != "":
-                  resp = create(Hover,
-                    @[
-                      markedString,
-                      create(MarkedStringOption, "", suggestions[0].doc),
-                    ],
-                    rangeopt
-                  ).JsonNode
-                else:
-                  resp = create(Hover, markedString, rangeopt).JsonNode;
+                  docs &= suggestions[0].doc
+                resp = create(Hover, newMarkupContent(docs), rangeopt).JsonNode;
                 await outs.respond(message, resp)
           of "textDocument/references":
             message.textDocumentRequest(ReferenceParams, referenceRequest):
