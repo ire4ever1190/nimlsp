@@ -317,7 +317,7 @@ proc main(ins: Stream | AsyncFile, outs: Stream | AsyncFile) {.multisync.} =
                     label = suggestion.qualifiedPath[^1].strip(chars = {'`'}),
                     kind = some(nimSymToLSPKind(suggestion).int),
                     detail = detail,
-                    documentation = some(suggestion.doc),
+                    documentation = some(newMarkupContent(suggestion.doc)),
                     deprecated = none(bool),
                     preselect = none(bool),
                     sortText = some(fmt"{i:04}"),

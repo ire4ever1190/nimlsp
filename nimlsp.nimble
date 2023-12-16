@@ -5,7 +5,7 @@ author        = "PMunch"
 description   = "Nim Language Server Protocol - nimlsp implements the Language Server Protocol"
 license       = "MIT"
 srcDir        = "src"
-bin           = @["nimlsp", "nimlsp_debug"]
+bin           = @["nimlsp"]
 
 # Dependencies
 
